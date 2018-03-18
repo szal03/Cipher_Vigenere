@@ -3,11 +3,7 @@
 #include <fstream>
 #include <Windows.h>
 
-
 using namespace std;
-
-
-
 
 int odszyfrowanie(string text, string second_text, string key)
 {
@@ -23,6 +19,7 @@ int odszyfrowanie(string text, string second_text, string key)
 	getline(d, text);
 	cout << "wprowadz klucz: ";
 	cin >> key;
+	//cout<<"ile kolumn?";
 
 
 	for (int i = 0; i < text.length(); i++)
@@ -41,17 +38,13 @@ int odszyfrowanie(string text, string second_text, string key)
 			}
 		}
 	}
-
-
 	cout << endl << "odszyfrowany tekst: \n\n";
-
 
 	for (int i = 0; i < text.length(); i++) 
 	{
 		cout << second_text[i];
-		e << second_text[i];
+		e << second_text[i]; // odszyfrowany juz tekst
 	}
-
 
 	cout << endl << endl;
 	d.close();
@@ -60,10 +53,11 @@ int odszyfrowanie(string text, string second_text, string key)
 	return 0;
 }
 
-void liczenie_literek(unsigned int kolumna[26], string second_text, unsigned int dlugosc_klucza, int ktora_kolumna) 
+void przeliczanie(unsigned int kolumna[26], string second_text, unsigned int ile_kolumn, int ktora_kolumna) 
 {
 	int pozycja = 0; //pozycja kolumny
 	int indeks_litery; //ascii 
+	//int a;
 	for (int i = 0; i < second_text.length(); i++)
 	{
 		if (pozycja == ktora_kolumna)
@@ -72,16 +66,16 @@ void liczenie_literek(unsigned int kolumna[26], string second_text, unsigned int
 			kolumna[indeks_litery]++;
 		}
 		pozycja++;
-		if (pozycja >= dlugosc_klucza)
+		if (pozycja >= ile_kolumn)
 		{
 			pozycja = 0;
 		}
 	}
 }
 
-void przesun_wartosci(unsigned int kolumna[26])
+void zamiana(unsigned int kolumna[26]) //przesuwanie wartosci // musi byc 26
 {
-	int wartosc_przesuwana = kolumna[0];
+	int przesuniecie = kolumna[0]; //o ile 
 	for (int j = 0; j < 26; j++)
 	{
 		if (j <= 24)
@@ -90,7 +84,7 @@ void przesun_wartosci(unsigned int kolumna[26])
 		}
 		else
 		{
-			kolumna[25] = wartosc_przesuwana;
+			kolumna[25] = przesuniecie;
 		}
 	}
 }
@@ -101,20 +95,17 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 	unsigned int kolumna1[26];
 	unsigned int kolumna2[26];
 	unsigned int indeks_klucza;
-	unsigned int dlugosc_klucza; // tutaj zmieniaj d³ugoœæ klucza - na ile kolumn podzieliæ
+	unsigned int ile_kolumn; // tutaj zmieniaj d³ugoœæ klucza - na ile kolumn podzieliæ
 								 //dlugosc_klucza = key.size();
 	double wspolczynnik = 0;
-	string szyfrogram;
 	string klucz;
 	int N = 0;
 	int N1 = 0;
-	//	szyfrogram = text;
 	//klucz = key;
-	//
 	string s; //lancuch slow
 	int m = 0;
 	//int dlugosc_klucza; //dlugosc klucza
-	//plik
+	//plik - otwieranie, wpisywanie itd
 	ifstream c;
 	ofstream d;
 	string line;
@@ -130,7 +121,7 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 	cout << "wprowadz klucz: ";
 	cin >> key;
 	cout << "podaj ilosc kolumn: "; // ilosc kolumn=dlugosc klucza // pamietaj o 0 !!!
-	cin >> dlugosc_klucza;
+	cin >> ile_kolumn;
 
 
 	for (int i = 0; i < text.length(); i++) //tablica ascii
@@ -165,7 +156,7 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 	}
 
 	//zad 2 ##
-	liczenie_literek(kolumna1, second_text, dlugosc_klucza, 0);
+	przeliczanie(kolumna1, second_text, ile_kolumn, 0);
 
 
 	for (int i = 0; i < 26; i++)
@@ -173,7 +164,9 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 		N += kolumna1[i];
 		wspolczynnik += kolumna1[i] * (kolumna1[i] - 1);
 	}
-	cout << " Indeks zgodnosci dla zadanego podzialu na kolumny : " << wspolczynnik / (N*(N - 1)) << endl;
+	cout << "\n";
+	cout << " Indeks zgodnosci dla zadanego podzialu na kolumny : " << wspolczynnik / (N*(N - 1)) << endl; // wzorek z zadania
+	cout << "\n";
 
 	//zad3 ###
 	for (int i = 0; i < 26; i++)
@@ -182,15 +175,15 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 	}
 	
 
-	for (int e = 0; e < dlugosc_klucza; e++)
+	for (int e = 0; e < ile_kolumn; e++)
 	{
-		liczenie_literek(kolumna1, second_text, dlugosc_klucza, e);
+		przeliczanie(kolumna1, second_text, ile_kolumn, e);
 
-		for (int j = 0; j < dlugosc_klucza; j++)
+		for (int j = 0; j < ile_kolumn; j++)
 		{
 			if (j > e)
 			{
-				liczenie_literek(kolumna2, second_text, dlugosc_klucza, j);
+				przeliczanie(kolumna2, second_text, ile_kolumn, j);
 				N = 0;
 				N1 = 0;
 				wspolczynnik = 0;
@@ -200,8 +193,9 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 					N1 += kolumna2[k];
 					wspolczynnik += (kolumna1[k] * kolumna2[k]);
 				}
-
-				cout << " wspolczynnik miedzy kolumna: " << e + 1 << " a kolumna " << j + 1 << " = " << wspolczynnik / (N*N1) << endl;
+				cout << "\n";
+				//odp zad3
+				cout << " wspolczynnik miedzy kolumna: " << e + 1 << " a kolumna " << j + 1 << " = " << wspolczynnik / (N*N1) << "\n";
 
 				for (int k = 0; k < 26; k++)
 				{
@@ -214,11 +208,6 @@ int szyfrowanie(string text, string second_text, string key)  //second_text - te
 			kolumna1[j] = 0;
 		}
 	}
-
-
-
-
-
 
 	c.close();
 	d.close();
@@ -240,14 +229,12 @@ int main()
 	unsigned int kolumna1[26];
 	unsigned int kolumna2[26];
 	unsigned int indeks_klucza;
-	unsigned int dlugosc_klucza; // tutaj zmieniaj d³ugoœæ klucza - na ile kolumn podzieliæ
 	//dlugosc_klucza = key.size();
 	double wspolczynnik = 0;
-	string szyfrogram;
 	string klucz;
-	int N = 0;
-	int N1 = 0;
-	//	szyfrogram = text;
+	int N = 0; // z zadania
+	int N1 = 0; //z zadania
+	//
 	//klucz = key;
 	//
 	a.open("tekst_Vigenere2.txt");
@@ -263,10 +250,12 @@ int main()
 	cout << "1 - zaszyfruj tekst" << endl;
 	cout << "2 - odszyfruj tekst" << endl;
 
-	int input;
-	cin >> input;
 
-	switch (input)
+	int odp;
+	cin >> odp;
+
+
+	switch (odp)
 	{
 	case 1:
 		szyfrowanie(text, second_text, key);
